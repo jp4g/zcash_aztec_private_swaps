@@ -1,0 +1,3 @@
+[submodule "deps/WebZjs"]
+	path = deps/WebZjs
+	url = git@github.com:ChainSafe/WebZjs.git
