@@ -4,10 +4,113 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>web-app</title>
+    <title>Zcash Secure Wallet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   </head>
   <body>
-    <div id="app"></div>
+    <div class="cyberpunk-bg"></div>
+    <div class="grid-overlay"></div>
+    
+    <div id="app" class="main-container">
+      <div class="header-section">
+        <h1 class="main-title">
+          <span class="brand-text">Zcash</span>
+          <span class="subtitle">Secure Wallet</span>
+        </h1>
+        <div class="status-bar">
+          <div class="status-item">
+            <div class="status-indicator"></div>
+            <span class="status-text">Connected</span>
+          </div>
+          <div class="status-item" id="block-status" style="display: none;">
+            <span class="status-label">Block:</span>
+            <span id="header-block-height" class="status-value">-</span>
+          </div>
+          <div class="status-item" id="sync-status" style="display: none;">
+            <div class="sync-dot"></div>
+            <span class="status-text">Synchronized</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="loading" class="loading-section">
+        <div class="loader">
+          <div class="loader-spinner"></div>
+        </div>
+        <div class="loading-text">
+          <span>Initializing wallet...</span>
+        </div>
+      </div>
+
+      <div id="wallet-info" class="wallet-section" style="display: none;">
+        <div class="data-panel wallet-address-panel">
+          <div class="panel-header">
+            <h3>Wallet Address</h3>
+          </div>
+          <div class="data-display">
+            <p id="wallet-address" class="address-text"></p>
+            <button class="copy-btn" onclick="copyToClipboard('wallet-address')">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="payment-section" class="payment-section" style="display: none;">
+        <div class="payment-panel">
+          <div class="panel-header">
+            <h3>Send Payment</h3>
+          </div>
+          <form id="payment-form" class="payment-form">
+            <div class="form-group">
+              <label for="recipient-address">Recipient Address</label>
+              <input 
+                type="text" 
+                id="recipient-address" 
+                class="form-input address-input" 
+                placeholder="Enter Zcash address..." 
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="amount">Amount (Zatoshis)</label>
+              <input 
+                type="number" 
+                id="amount" 
+                class="form-input amount-input" 
+                placeholder="0" 
+                step="1" 
+                min="0" 
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="partial-note">Partial Note</label>
+              <input 
+                type="text" 
+                id="partial-note" 
+                class="form-input hex-input" 
+                placeholder="Enter hex string..." 
+                pattern="^[0-9a-fA-F]*$"
+                title="Please enter a valid hex string (0-9, a-f, A-F)"
+              />
+            </div>
+            <button type="submit" class="pay-btn">
+              <span class="btn-text">Pay</span>
+              <span class="btn-loading" style="display: none;">Processing...</span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div id="error" class="error-section" style="display: none;">
+        <div class="error-panel">
+          <div class="error-icon">⚠</div>
+          <div class="error-message"></div>
+        </div>
+      </div>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
