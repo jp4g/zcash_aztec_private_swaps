@@ -1,0 +1,17 @@
+{
+  "name": "scripts",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@aztec/accounts": "^2.0.3",
+    "@aztec/aztec": "^2.0.3",
+    "@defi-wonderland/aztec-standards": "^2.0.3"
+  }
+}
