@@ -18,8 +18,9 @@ pub contract PrivatePayment {
             contract_class_id::ContractClassId,
             traits::{FromField, ToField},
         },
-        state_vars::{Map, public_immutable::PublicImmutable, public_mutable::PublicMutable
-        , private_immutable::PrivateImmutable
+        state_vars::{
+            Map, private_immutable::PrivateImmutable, public_immutable::PublicImmutable,
+            public_mutable::PublicMutable,
         },
     };
 
@@ -42,14 +43,36 @@ pub contract PrivatePayment {
         let self_address = context.this_address();
         let caller = context.msg_sender();
 
-        let partial_note = Token::at(token_address).initialize_transfer_commitment(
-            self_address,
-            caller,
-            self_address,
-        ).call(&mut context);
+        let partial_note = Token::at(token_address)
+            .initialize_transfer_commitment(self_address, caller, self_address)
+            .call(&mut context);
 
         storage.token_address.initialize(AddressNote::new(token_address, self_address));
         storage.token_amount.initialize(UintNote::new(token_amount, self_address));
-        storage.commitment.initialize(ValueNote::new(partial_note, self_address));
+
+        storage.commitment.initialize(ValueNote::new(partial_note, self_address)).emit(
+            encode_and_encrypt_note(&mut context, self_address),
+        );
+    }
+
+    #[private]
+    fn complete_order(_nonce: Field) {
+        let token_address = storage.token_address.get_note().get_address();
+        let token_amount = storage.token_amount.get_note().get_value();
+        let commitment = storage.commitment.get_note().value();
+
+        let self_address = context.this_address();
+        let caller = context.msg_sender();
+
+        Token::at(token_address)
+            .transfer_private_to_private(caller, self_address, token_amount, _nonce)
+            .call(&mut context);
+
+        Token::at(token_address).transfer_private_to_commitment(
+            self_address,
+            commitment,
+            token_amount,
+            0,
+        );
     }
 }
