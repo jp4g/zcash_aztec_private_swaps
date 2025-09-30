@@ -73,6 +73,6 @@ pub contract PrivatePayment {
             commitment,
             token_amount,
             0,
-        );
+        ).call(&mut context);
     }
 }

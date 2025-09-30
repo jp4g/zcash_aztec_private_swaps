@@ -1,1 +1,4 @@
-{"address":"0x0cd72c09a39fb7889e36f6a7496e2ffb7287692d35ba8355e7b51950f87b0125"}
+{
+  "tokenAddress": "0x0d42e931ff79f6c0b4c699f7b5dead19a2d34084b5d7e475e06dba578f7be38b",
+  "privatePaymentAddress": "0x044d91d846fb167dd1fb5a51883b71eb5fb49405f493f593f6aa14bd1a1a3559"
+}

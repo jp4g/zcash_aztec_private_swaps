@@ -1,7 +1,13 @@
-import { AztecAddress, createPXEClient } from "@aztec/aztec.js";
+import {
+  AztecAddress,
+  createPXEClient,
+  ProtocolContractAddress,
+  TxStatus,
+} from "@aztec/aztec.js";
 import { getInitialTestAccountsManagers } from "@aztec/accounts/testing";
 import { TokenContract } from "../deps/aztec-standards/artifacts/Token";
-import { address as tokenContractAddressString } from "./deployment.json";
+import { tokenAddress as tokenContractAddressString } from "./deployment.json";
+import { isConstructSignatureDeclaration } from "typescript";
 
 const main = async () => {
   const NODE_URL = process.env.NODE_URL || "http://localhost:8080";
@@ -25,21 +31,26 @@ const main = async () => {
   const recepient = wallets[1];
   if (!recepient) throw new Error("Recipient wallet not found");
 
+  const mintAmount = 100;
+
   const recipientAddress = recepient.getAddress();
 
   const tokenContract = await TokenContract.at(tokenContractAddress, deployer);
 
-  const result = await tokenContract.methods
-    .initialize_transfer_commitment(
-      deployerAddress,
-      recipientAddress,
-      deployerAddress,
-    )
-    .prove({
+  const { status } = await tokenContract.methods
+    .mint_to_private(deployerAddress, recipientAddress, mintAmount)
+    .send({
       from: deployerAddress,
-    });
+    })
+    .wait();
 
-  console.log("proven data", result.data);
+  if (status === TxStatus.SUCCESS) {
+    console.log("Tokens minted successfully");
+  } else {
+    console.log("Tokens minting failed");
+    console.log("Error:", status);
+    process.exit(1);
+  }
 };
 
 main();

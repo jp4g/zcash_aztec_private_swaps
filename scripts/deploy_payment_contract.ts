@@ -1,11 +1,10 @@
 import { writeFileSync } from "node:fs";
 
-import { createPXEClient } from "@aztec/aztec.js";
+import { AztecAddress, createPXEClient } from "@aztec/aztec.js";
 import { getInitialTestAccountsManagers } from "@aztec/accounts/testing";
-import {
-  TokenContract,
-  TokenContractArtifact,
-} from "../deps/aztec-standards/artifacts/Token";
+import { PrivatePaymentContract } from "./artifacts/PrivatePayment";
+
+import { tokenAddress as TokenAddressString } from "./deployment.json";
 
 // this script deploys a defi-wonderland token contract
 // it also mints
@@ -25,20 +24,16 @@ const main = async () => {
 
   const deployerAddress = deployWallet.getAddress();
 
-  const tokenName = "USDC";
-  const tokenSymbol = "USDC";
-  const decimals = 18;
+  const tokenAddress = AztecAddress.fromString(TokenAddressString);
+  const tokenAmount = 100;
 
-  const { status, contract } = await TokenContract.deployWithOpts(
+  const { status, contract } = await PrivatePaymentContract.deployWithOpts(
     {
       wallet: deployWallet,
-      method: "constructor_with_minter",
+      method: "constructor",
     },
-    tokenName,
-    tokenSymbol,
-    decimals,
-    deployerAddress,
-    deployerAddress,
+    tokenAddress,
+    tokenAmount,
   )
     .send({
       from: deployerAddress,
@@ -46,15 +41,18 @@ const main = async () => {
     .wait();
 
   if (status) {
-    console.log(`Token contract deployed at ${contract.address}`);
-    console.log(`Token contract status: ${status}`);
+    console.log(`Private payment contract deployed at ${contract.address}`);
+    console.log(`Private payment contract status: ${status}`);
 
     writeFileSync(
       "./deployment.json",
-      JSON.stringify({ tokenAddress: contract.address }),
+      JSON.stringify({
+        tokenAddress: TokenAddressString,
+        privatePaymentAddress: contract.address,
+      }),
     );
   } else {
-    console.log(`Token contract deployment failed`);
+    console.log(`Private payment contract deployment failed`);
     console.log(`Error: ${status}`);
     process.exit(1);
   }
