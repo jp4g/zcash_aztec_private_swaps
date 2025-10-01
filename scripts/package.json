@@ -12,6 +12,7 @@
   "dependencies": {
     "@aztec/accounts": "^2.0.3",
     "@aztec/aztec": "^2.0.3",
+    "@aztec/stdlib": "^2.0.3",
     "@defi-wonderland/aztec-standards": "^2.0.3"
   }
 }

@@ -47,8 +47,13 @@ pub contract PrivatePayment {
             .initialize_transfer_commitment(self_address, caller, self_address)
             .call(&mut context);
 
-        storage.token_address.initialize(AddressNote::new(token_address, self_address));
-        storage.token_amount.initialize(UintNote::new(token_amount, self_address));
+        storage.token_address.initialize(AddressNote::new(token_address, self_address)).emit(
+             encode_and_encrypt_note(&mut context, self_address)
+        );
+
+        storage.token_amount.initialize(UintNote::new(token_amount, self_address)).emit(
+             encode_and_encrypt_note(&mut context, self_address)
+        );
 
         storage.commitment.initialize(ValueNote::new(partial_note, self_address)).emit(
             encode_and_encrypt_note(&mut context, self_address),

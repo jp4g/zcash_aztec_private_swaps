@@ -1,10 +1,11 @@
 import { writeFileSync } from "node:fs";
 
-import { AztecAddress, createPXEClient } from "@aztec/aztec.js";
+import { AztecAddress, createPXEClient, deriveKeys, Fr } from "@aztec/aztec.js";
 import { getInitialTestAccountsManagers } from "@aztec/accounts/testing";
 import { PrivatePaymentContract } from "./artifacts/PrivatePayment";
 
 import { tokenAddress as TokenAddressString } from "./deployment.json";
+import { computePartialAddress } from "@aztec/stdlib/contract";
 
 // this script deploys a defi-wonderland token contract
 // it also mints
@@ -27,22 +28,27 @@ const main = async () => {
   const tokenAddress = AztecAddress.fromString(TokenAddressString);
   const tokenAmount = 100;
 
-  const { status, contract } = await PrivatePaymentContract.deployWithOpts(
-    {
-      wallet: deployWallet,
-      method: "constructor",
-    },
-    tokenAddress,
-    tokenAmount,
-  )
-    .send({
-      from: deployerAddress,
-    })
-    .wait();
+  const contractSecretKey = Fr.random();
+  const contractPublicKeys = (await deriveKeys(contractSecretKey)).publicKeys;
+
+  const { status, contract } =
+    await PrivatePaymentContract.deployWithPublicKeys(
+      contractPublicKeys,
+      deployWallet,
+      tokenAddress,
+      tokenAmount,
+    )
+      .send({
+        from: deployerAddress,
+      })
+      .wait();
 
   if (status) {
     console.log(`Private payment contract deployed at ${contract.address}`);
     console.log(`Private payment contract status: ${status}`);
+
+    const partialAddress = await computePartialAddress(contract.instance);
+    await pxe.registerAccount(contractSecretKey, partialAddress);
 
     writeFileSync(
       "./deployment.json",
