@@ -82,9 +82,16 @@ const getAddress = async (): Promise<string> => {
   return await response.text();
 };
 
-const createJob = async (): Promise<string> => {
+const createJob = async (contractAddress: string, amount: number): Promise<string> => {
   const response = await fetch(`${API_BASE_URL}/create_job`, {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      contract_address: contractAddress,
+      amount: amount,
+    }),
   });
   if (!response.ok) {
     throw new Error('Failed to create job');
@@ -115,7 +122,7 @@ const pollJobStatus = async (jobId: string): Promise<void> => {
 };
 
 // Escrow form handler
-const handleEscrowSubmission = async (partialAddress: string) => {
+const handleEscrowSubmission = async (contractAddress: string, amount: number) => {
   const payBtn = document.querySelector('.pay-btn') as HTMLButtonElement;
   const btnText = document.querySelector('.btn-text');
   const btnLoading = document.querySelector('.btn-loading');
@@ -128,10 +135,11 @@ const handleEscrowSubmission = async (partialAddress: string) => {
     btnLoading.style.display = 'none';
 
     try {
-      console.log('Partial escrow address:', partialAddress);
+      console.log('Contract address:', contractAddress);
+      console.log('Amount:', amount);
 
       // Create job
-      const jobId = await createJob();
+      const jobId = await createJob(contractAddress, amount);
       console.log('Job created:', jobId);
 
       // Update button to show polling status
@@ -171,14 +179,16 @@ const main = async () => {
         e.preventDefault();
 
         const partialAddressInput = document.getElementById('partial-address') as HTMLInputElement;
+        const amountInput = document.getElementById('amount') as HTMLInputElement;
 
-        if (partialAddressInput) {
-          const partialAddress = partialAddressInput.value.trim();
+        if (partialAddressInput && amountInput) {
+          const contractAddress = partialAddressInput.value.trim();
+          const amount = parseInt(amountInput.value, 10);
 
-          if (partialAddress) {
-            await handleEscrowSubmission(partialAddress);
+          if (contractAddress && amount > 0) {
+            await handleEscrowSubmission(contractAddress, amount);
           } else {
-            showError('Please enter a valid partial escrow address');
+            showError('Please enter a valid contract address and amount');
           }
         }
       });
