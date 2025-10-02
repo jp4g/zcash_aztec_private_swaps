@@ -1,3 +1,6 @@
 [submodule "deps/aztec-standards"]
 	path = deps/aztec-standards
 	url = git@github.com:defi-wonderland/aztec-standards.git
+[submodule "deps/zcash-rust-client"]
+	path = deps/zcash-rust-client
+	url = git@github.com:bajpai244/WebZjs.git
