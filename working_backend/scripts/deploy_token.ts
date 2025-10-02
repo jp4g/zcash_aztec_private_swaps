@@ -5,7 +5,7 @@ import { getInitialTestAccountsManagers } from "@aztec/accounts/testing";
 import {
   TokenContract,
   TokenContractArtifact,
-} from "../deps/aztec-standards/artifacts/Token";
+} from "../../deps/aztec-standards/artifacts/Token";
 
 // this script deploys a defi-wonderland token contract
 // it also mints

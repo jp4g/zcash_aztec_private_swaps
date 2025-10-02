@@ -2,9 +2,9 @@ import { writeFileSync } from "node:fs";
 
 import { AztecAddress, createPXEClient, deriveKeys, Fr } from "@aztec/aztec.js";
 import { getInitialTestAccountsManagers } from "@aztec/accounts/testing";
-import { PrivatePaymentContract } from "./artifacts/PrivatePayment";
+import { PrivatePaymentContract } from "../artifacts/PrivatePayment";
 
-import { tokenAddress as TokenAddressString } from "./deployment.json";
+import { tokenAddress as TokenAddressString } from "../deployment.json";
 import { computePartialAddress } from "@aztec/stdlib/contract";
 
 // this script deploys a defi-wonderland token contract

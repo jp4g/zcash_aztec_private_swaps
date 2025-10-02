@@ -298,6 +298,10 @@ body {
   margin-top: 3rem;
 }
 
+.wallet-section .payment-panel {
+  margin-top: 2rem;
+}
+
 .payment-panel {
   background: var(--surface);
   border: 2px solid var(--border-primary);
@@ -420,6 +424,50 @@ body {
   border-top: 2px solid white;
   border-radius: 50%;
   animation: spin 1s linear infinite;
+}
+
+/* Success Section */
+.success-section {
+  margin-top: 2rem;
+}
+
+.success-panel {
+  background: rgba(40, 167, 69, 0.1);
+  border: 2px solid rgba(40, 167, 69, 0.3);
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  backdrop-filter: blur(20px);
+  text-align: center;
+}
+
+.success-icon {
+  font-size: 4rem;
+  color: var(--success-color);
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(40, 167, 69, 0.2);
+  border-radius: 50%;
+  animation: success-pop 0.5s ease-out;
+}
+
+@keyframes success-pop {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.success-message {
+  color: var(--success-color);
+  font-weight: 600;
+  font-size: 1.25rem;
+  line-height: 1.6;
 }
 
 /* Error Section */
