@@ -7,12 +7,12 @@ import {
   TxStatus,
 } from "@aztec/aztec.js";
 import { getInitialTestAccountsManagers } from "@aztec/accounts/testing";
-import { TokenContract } from "./artifacts/Token";
+import { TokenContract } from "../artifacts/Token";
 import {
   tokenAddress as tokenContractAddressString,
   privatePaymentAddress as privatePaymentContractAddressString,
 } from "./deployment.json";
-import { PrivatePaymentContract } from "./artifacts/PrivatePayment";
+import { PrivatePaymentContract } from "../artifacts/PrivatePayment";
 import { isConstructSignatureDeclaration } from "typescript";
 
 const main = async () => {

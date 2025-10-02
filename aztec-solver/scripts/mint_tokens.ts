@@ -5,8 +5,8 @@ import {
   TxStatus,
 } from "@aztec/aztec.js";
 import { getInitialTestAccountsManagers } from "@aztec/accounts/testing";
-import { TokenContract } from "./artifacts/Token";
-import { tokenAddress as tokenContractAddressString } from "./deployment.json";
+import { TokenContract } from "../artifacts/Token";
+import { tokenAddress as tokenContractAddressString } from "../deployment.json";
 import { isConstructSignatureDeclaration } from "typescript";
 
 const main = async () => {

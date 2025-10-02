@@ -1,6 +1,6 @@
 {
   "name": "scripts",
-  "module": "index.ts",
+  "module": "src/app.ts",
   "type": "module",
   "private": true,
   "devDependencies": {
@@ -13,6 +13,11 @@
     "@aztec/accounts": "^2.0.3",
     "@aztec/aztec": "^2.0.3",
     "@aztec/stdlib": "^2.0.3",
-    "@defi-wonderland/aztec-standards": "^2.0.3"
+    "@defi-wonderland/aztec-standards": "^2.0.3",
+    "@types/express": "^5.0.3",
+    "express": "^5.1.0"
+  },
+  "scripts": {
+    "start": "bun run src/app.ts"
   }
 }

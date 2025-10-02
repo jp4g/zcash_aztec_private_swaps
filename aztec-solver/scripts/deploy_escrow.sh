@@ -1,0 +1,1 @@
+curl -X POST http://localhost:4000/deploy_escrow -H "Content-Type: application/json"  -d '{"amount": "100"}'

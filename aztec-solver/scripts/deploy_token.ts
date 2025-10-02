@@ -2,10 +2,7 @@ import { writeFileSync } from "node:fs";
 
 import { createPXEClient } from "@aztec/aztec.js";
 import { getInitialTestAccountsManagers } from "@aztec/accounts/testing";
-import {
-  TokenContract,
-  TokenContractArtifact,
-} from "../../deps/aztec-standards/artifacts/Token";
+import { TokenContract, TokenContractArtifact } from "../artifacts/Token";
 
 // this script deploys a defi-wonderland token contract
 // it also mints
