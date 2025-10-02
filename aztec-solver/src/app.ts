@@ -1,4 +1,5 @@
 import express from "express"
+import cors from "cors"
 
 import { AztecAddress, createPXEClient, deriveKeys, Fr, TxStatus } from "@aztec/aztec.js";
 import { getInitialTestAccountsManagers } from "@aztec/accounts/testing";
@@ -37,6 +38,7 @@ const recipientAddress = recepient.getAddress();
   const decimals = 18;
 
   // Middleware
+  app.use(cors());
   app.use(express.json());
 
   app.post("/deploy_escrow", async (req: Request, res: Response) => {

@@ -4,7 +4,8 @@
   "type": "module",
   "private": true,
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/cors": "^2.8.19"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -15,6 +16,7 @@
     "@aztec/stdlib": "^2.0.3",
     "@defi-wonderland/aztec-standards": "^2.0.3",
     "@types/express": "^5.0.3",
+    "cors": "^2.8.5",
     "express": "^5.1.0"
   },
   "scripts": {
