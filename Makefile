@@ -4,7 +4,6 @@
 init:
 	git submodule update --init --recursive
 
-
 build-token:
 	cd deps/aztec-standards && aztec-nargo compile && aztec-postprocess-contract && aztec codegen -o ./artifacts target
 
