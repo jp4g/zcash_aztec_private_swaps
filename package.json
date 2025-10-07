@@ -13,7 +13,7 @@
   },
   "scripts": {
     "after": "make init && make build-deps && make build-token && make build-contract",
-    "orchestrate": "docker-compose --env-file .env up --build"
+    "orchestrate": "docker compose down -v && docker compose --env-file .env up --build"
   },
   "dependencies": {
     "dotenv": "^17.2.3"

@@ -7,7 +7,7 @@ import { TokenContract, TokenContractArtifact } from "../artifacts/Token";
 // this script deploys a defi-wonderland token contract
 // it also mints
 const main = async () => {
-  const NODE_URL = process.env.NODE_URL || "http://localhost:8080";
+  const NODE_URL = process.env.NODE_URL || "http://localhost:8081";
 
   const pxe = createPXEClient(NODE_URL);
 
@@ -47,7 +47,7 @@ const main = async () => {
     console.log(`Token contract status: ${status}`);
 
     writeFileSync(
-      "./deployment.json",
+      "./data/deployment.json",
       JSON.stringify({ tokenAddress: contract.address }),
     );
   } else {

@@ -5,7 +5,7 @@ import { AztecAddress, createPXEClient, deriveKeys, Fr, TxStatus } from "@aztec/
 import { getInitialTestAccountsManagers } from "@aztec/accounts/testing";
 
 import { PrivatePaymentContract } from "../artifacts/PrivatePayment"
-import {tokenAddress as TokenAddressString} from "../deployment.json"
+import {tokenAddress as TokenAddressString} from "../data/deployment.json"
 import { computePartialAddress } from "@aztec/stdlib/contract";
 import { TokenContract } from "../artifacts/Token";
 
@@ -137,13 +137,12 @@ const recipientAddress = recepient.getAddress();
 
   app.get("/balance", async (req: Request, res: Response) => {
     const tokenAddress = AztecAddress.fromString(TokenAddressString);
-    
     const tokenContract = await TokenContract.at(tokenAddress, recepient);
     const balance = await tokenContract
     .withWallet(deployWallet)
-    .methods.balance_of_private(deployerAddress)
+    .methods.balance_of_private(recipientAddress)
     .simulate({
-      from: deployerAddress,
+      from: recipientAddress,
     });
 
     res.json({ balance: balance.toString() });

@@ -6,11 +6,11 @@ import {
 } from "@aztec/aztec.js";
 import { getInitialTestAccountsManagers } from "@aztec/accounts/testing";
 import { TokenContract } from "../artifacts/Token";
-import { tokenAddress as tokenContractAddressString } from "../deployment.json";
+import { tokenAddress as tokenContractAddressString } from "../data/deployment.json";
 import { isConstructSignatureDeclaration } from "typescript";
 
 const main = async () => {
-  const NODE_URL = process.env.NODE_URL || "http://localhost:8080";
+  const NODE_URL = process.env.NODE_URL || "http://localhost:8081";
   const tokenContractAddress = AztecAddress.fromString(
     tokenContractAddressString,
   );

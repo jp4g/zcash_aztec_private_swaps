@@ -32,8 +32,11 @@ RUN bun install --frozen-lockfile
 
 # Copy application source
 COPY solver/src ./src
+COPY solver/scripts ./scripts
 COPY solver/tsconfig.json ./
-COPY solver/deployment.json ./
+
+# Create data directory for shared deployment.json
+RUN mkdir -p ./data
 
 # Copy built contract artifacts from builder stage
 COPY --from=builder /build/deps/aztec-standards/artifacts ./artifacts

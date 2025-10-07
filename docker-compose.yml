@@ -89,6 +89,24 @@ services:
     networks:
       - aztec-network
 
+  # Aztec Solver Init - Deploy token contract and mint (runs once)
+  solver-init:
+    build:
+      context: .
+      dockerfile: solver/Dockerfile
+    container_name: solver-init
+    command: ["/bin/bash", "-c", "bun run scripts/deploy_token.ts && bun run scripts/mint_tokens.ts"]
+    environment:
+      - NODE_URL=http://aztec-pxe:8081
+    volumes:
+      - solver-data:/app/data
+    depends_on:
+      aztec-pxe:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - aztec-network
+
   # Aztec Solver - Backend API for Aztec contracts
   solver:
     build:
@@ -100,7 +118,11 @@ services:
     environment:
       - NODE_URL=http://aztec-pxe:8081
       - PORT=4000
+    volumes:
+      - solver-data:/app/data
     depends_on:
+      solver-init:
+        condition: service_completed_successfully
       aztec-pxe:
         condition: service_healthy
     networks:
@@ -137,6 +159,9 @@ services:
     restart: unless-stopped
     networks:
       - aztec-network
+
+volumes:
+  solver-data:
 
 networks:
   aztec-network:
