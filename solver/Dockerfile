@@ -25,15 +25,15 @@ FROM oven/bun:latest
 WORKDIR /app
 
 # Copy package files
-COPY aztec-solver/package.json aztec-solver/bun.lock ./
+COPY solver/package.json ./
 
 # Install dependencies
 RUN bun install --frozen-lockfile
 
 # Copy application source
-COPY aztec-solver/src ./src
-COPY aztec-solver/tsconfig.json ./
-COPY aztec-solver/deployment.json ./
+COPY solver/src ./src
+COPY solver/tsconfig.json ./
+COPY solver/deployment.json ./
 
 # Copy built contract artifacts from builder stage
 COPY --from=builder /build/deps/aztec-standards/artifacts ./artifacts

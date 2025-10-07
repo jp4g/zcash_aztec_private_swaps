@@ -13,10 +13,11 @@ const main = async () => {
   const app = express();
   const PORT = process.env.PORT || 4000;
 
-  const NODE_URL = process.env.NODE_URL || "http://localhost:8080";
-
+  console.log("trying to connect")
+  const NODE_URL = process.env.NODE_URL || "http://localhost:8081";
+  console.log("Connected to node at:", NODE_URL);
   const pxe = createPXEClient(NODE_URL);
-
+  console.log("yay")
   const wallets = await Promise.all(
     (await getInitialTestAccountsManagers(pxe)).map((manager) => {
       return manager.register();

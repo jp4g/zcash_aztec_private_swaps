@@ -66,7 +66,7 @@ services:
       - "8081:8081"  # PXE API
     environment:
       # PXE configuration
-      - PXE_PORT=8081
+      - AZTEC_PORT=8081
       - AZTEC_NODE_URL=http://aztec-sandbox:8080
       - LOG_LEVEL=info
 
@@ -79,36 +79,30 @@ services:
     depends_on:
       aztec-sandbox:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/status"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
     restart: unless-stopped
     networks:
       - aztec-network
 
   # Aztec Solver - Backend API for Aztec contracts
-  aztec-solver:
+  solver:
     build:
       context: .
-      dockerfile: aztec-solver/Dockerfile
-    container_name: aztec-solver
+      dockerfile: solver/Dockerfile
+    container_name: solver
     ports:
       - "4000:4000"
     environment:
       - NODE_URL=http://aztec-pxe:8081
       - PORT=4000
     depends_on:
-      - aztec-pxe
-    restart: unless-stopped
-    networks:
-      - aztec-network
-
-  # Zcash Web App - Frontend
-  zcash-web-app:
-    build:
-      context: .
-      dockerfile: zcash-web-app/Dockerfile
-    container_name: zcash-web-app
-    ports:
-      - "5173:5173"
-    restart: unless-stopped
+      aztec-pxe:
+        condition: service_healthy
     networks:
       - aztec-network
 
@@ -119,12 +113,27 @@ services:
       dockerfile: Dockerfile
     container_name: zcash-client
     ports:
-      - "8082:8080"
+      - "3000:8080"
     environment:
       - SEED_PHRASE=${SEED_PHRASE:-abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about}
       - LIGHT_CLIENT_URL=${LIGHT_CLIENT_URL:-https://testnet.zec.rocks:443}
       - BIRTHDAY_HEIGHT=${BIRTHDAY_HEIGHT:-3600843}
       - MAINNET=${MAINNET:-false}
+    restart: unless-stopped
+    networks:
+      - aztec-network
+
+  # Web App - Unified frontend for both Zcash and Aztec
+  web-app:
+    build:
+      context: ./web-app
+      dockerfile: Dockerfile
+    container_name: web-app
+    ports:
+      - "5173:5173"
+    depends_on:
+      - solver
+      - zcash-client
     restart: unless-stopped
     networks:
       - aztec-network

@@ -3,8 +3,7 @@
   "workspaces": {
     "packages": [
       "solver",
-      "aztec-web-app",
-      "zcash-web-app"
+      "web-app"
     ],
     "catalog": {
       "@types/bun": "latest",
@@ -15,5 +14,8 @@
   "scripts": {
     "after": "make init && make build-deps && make build-token && make build-contract",
     "orchestrate": "docker-compose --env-file .env up --build"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3"
   }
 }

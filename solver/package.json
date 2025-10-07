@@ -4,11 +4,9 @@
   "type": "module",
   "private": true,
   "devDependencies": {
-    "@types/bun": "catalog:",
-    "@types/cors": "^2.8.19"
-  },
-  "peerDependencies": {
-    "typescript": "catalog:"
+    "@types/bun": "latest",
+    "@types/cors": "^2.8.19",
+    "typescript": "~5.9.3"
   },
   "dependencies": {
     "@aztec/accounts": "^2.0.3",
