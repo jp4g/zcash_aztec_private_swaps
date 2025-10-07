@@ -1,6 +1,13 @@
 # Stage 1: Build WASM packages
 FROM rustlang/rust:nightly AS wasm-builder
 
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    clang \
+    llvm \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install nightly toolchain and wasm-pack
 RUN rustup toolchain install nightly-2025-01-06
 RUN rustup default nightly-2025-01-06

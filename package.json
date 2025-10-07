@@ -1,0 +1,19 @@
+{
+  "name": "@aztec-pioneers/zcash-swaps",
+  "workspaces": {
+    "packages": [
+      "solver",
+      "aztec-web-app",
+      "zcash-web-app"
+    ],
+    "catalog": {
+      "@types/bun": "latest",
+      "typescript": "~5.9.3",
+      "vite": "^7.1.7"
+    }
+  },
+  "scripts": {
+    "preinstall": "make init && make build-deps && make build-token && make build-contract",
+    "orchestrate": "docker-compose --env-file .env up --build"
+  }
+}

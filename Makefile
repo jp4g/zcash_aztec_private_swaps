@@ -12,7 +12,10 @@ build-contract:
 
 # Build dependencies by running 'just build' in the WebZjs submodule
 build-deps:
-	cd deps/WebZjs && just build
+	cd deps/zcash-rust-client && just build
+
+install:
+	bun run preinstall && bun run install
 
 # Display help information
 help:
