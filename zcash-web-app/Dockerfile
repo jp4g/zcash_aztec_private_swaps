@@ -24,24 +24,31 @@ WORKDIR /build/deps/zcash-rust-client
 RUN just build
 
 # Stage 2: Runtime - Vite dev server
-FROM node:20-slim
+FROM oven/bun:latest
 
 WORKDIR /app
 
 # Copy built WASM packages from builder
 COPY --from=wasm-builder /build/deps/zcash-rust-client/packages ./deps/zcash-rust-client/packages
 
+# Copy root package.json for workspace catalog
+COPY package.json ./
+
 # Copy zcash-web-app source
-COPY zcash-web-app/package.json zcash-web-app/package-lock.json ./
+COPY zcash-web-app/package.json zcash-web-app/bun.lock* ./zcash-web-app/
 
 # Install dependencies
-RUN npm ci
+WORKDIR /app/zcash-web-app
+RUN bun install --frozen-lockfile
 
 # Copy rest of application
-COPY zcash-web-app/ ./
+WORKDIR /app
+COPY zcash-web-app/ ./zcash-web-app/
+
+WORKDIR /app/zcash-web-app
 
 # Expose Vite dev server port
 EXPOSE 5173
 
 # Run Vite dev server with host flag to allow external access
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+CMD ["bun", "run", "dev", "--", "--host", "0.0.0.0"]

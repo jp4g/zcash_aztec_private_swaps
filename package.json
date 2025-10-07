@@ -13,7 +13,7 @@
     }
   },
   "scripts": {
-    "preinstall": "make init && make build-deps && make build-token && make build-contract",
+    "after": "make init && make build-deps && make build-token && make build-contract",
     "orchestrate": "docker-compose --env-file .env up --build"
   }
 }
