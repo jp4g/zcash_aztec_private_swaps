@@ -14,12 +14,12 @@
   <body>
     <div id="app" class="app-shell">
       <header class="view-tabs">
-        <button class="tab-button active" data-view="zcash">Zcash</button>
-        <button class="tab-button" data-view="aztec">Aztec</button>
+        <button class="tab-button" data-view="zcash">Zcash</button>
+        <button class="tab-button active" data-view="aztec">Aztec</button>
       </header>
 
       <main class="view-container">
-        <section id="zcash-view" class="view-panel zcash-panel active">
+        <section id="zcash-view" class="view-panel zcash-panel" hidden>
           <div class="cyberpunk-bg"></div>
           <div class="grid-overlay"></div>
 
@@ -60,6 +60,9 @@
               <div class="payment-panel">
                 <div class="panel-header">
                   <h3>Enter Escrow Details</h3>
+                </div>
+                <div id="zcash-escrow-info" class="info-banner" style="display: none;">
+                  start a swap in the aztec tab
                 </div>
                 <form id="zcash-payment-form" class="payment-form">
                   <div class="form-group">
@@ -107,7 +110,7 @@
           </div>
         </section>
 
-        <section id="aztec-view" class="view-panel aztec-panel" hidden>
+        <section id="aztec-view" class="view-panel aztec-panel active">
           <div class="aztec-overlay"></div>
           <div class="aztec-container">
             <h1>AZTEC SWAPS</h1>

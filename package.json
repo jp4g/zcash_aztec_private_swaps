@@ -12,8 +12,8 @@
     }
   },
   "scripts": {
-    "after": "make init && make build-deps && make build-token && make build-contract",
-    "orchestrate": "docker compose down -v && docker compose --env-file .env up --build"
+    "orchestrate": "docker compose down -v && docker compose --env-file .env up --build",
+    "mint": "docker compose exec solver bun run scripts/mint_tokens.ts"
   },
   "dependencies": {
     "dotenv": "^17.2.3"

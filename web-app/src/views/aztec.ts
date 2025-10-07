@@ -1,3 +1,5 @@
+import { getEscrowContract, saveEscrowContract } from '../storage.ts'
+
 const AZTEC_API_URL = 'http://localhost:4000'
 
 type AztecElements = {
@@ -149,6 +151,7 @@ const setupDeployHandler = (elements: AztecElements) => {
 
     try {
       const contractAddress = await deployEscrow(amountValue)
+      saveEscrowContract(contractAddress)
       showContractResult(elements, contractAddress)
       fetchBalance(elements)
     } catch (error) {
@@ -172,6 +175,11 @@ export const initAztecView = () => {
   setupCopyHandler(elements)
   setupDeployHandler(elements)
   fetchBalance(elements)
+
+  const storedContract = getEscrowContract()
+  if (storedContract) {
+    showContractResult(elements, storedContract)
+  }
 
   if (balanceInterval) {
     window.clearInterval(balanceInterval)

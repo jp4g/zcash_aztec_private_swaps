@@ -129,21 +129,21 @@ services:
       - aztec-network
 
   # Zcash Client - Rust backend
-  zcash-client:
-    build:
-      context: ./zcash-client
-      dockerfile: Dockerfile
-    container_name: zcash-client
-    ports:
-      - "3000:8080"
-    environment:
-      - SEED_PHRASE=${SEED_PHRASE:-abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about}
-      - LIGHT_CLIENT_URL=${LIGHT_CLIENT_URL:-https://testnet.zec.rocks:443}
-      - BIRTHDAY_HEIGHT=${BIRTHDAY_HEIGHT:-3600843}
-      - MAINNET=${MAINNET:-false}
-    restart: unless-stopped
-    networks:
-      - aztec-network
+  # zcash-client:
+  #   build:
+  #     context: ./zcash-client
+  #     dockerfile: Dockerfile
+  #   container_name: zcash-client
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - SEED_PHRASE=${SEED_PHRASE:-abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about}
+  #     - LIGHT_CLIENT_URL=${LIGHT_CLIENT_URL:-https://testnet.zec.rocks:443}
+  #     - BIRTHDAY_HEIGHT=${BIRTHDAY_HEIGHT:-3600843}
+  #     - MAINNET=${MAINNET:-false}
+  #   restart: unless-stopped
+  #   networks:
+  #     - aztec-network
 
   # Web App - Unified frontend for both Zcash and Aztec
   web-app:
@@ -155,7 +155,7 @@ services:
       - "5173:5173"
     depends_on:
       - solver
-      - zcash-client
+      # - zcash-client
     restart: unless-stopped
     networks:
       - aztec-network

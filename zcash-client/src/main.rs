@@ -1,25 +1,25 @@
 use std::{collections::HashMap, num::NonZero, str::FromStr, sync::Arc, time::Duration};
 
 use axum::{
-    Json, Router,
     extract::{Path, State},
     http::StatusCode,
     response::IntoResponse,
     routing::{get, post},
+    Json, Router,
 };
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use tokio::sync::RwLock;
 use tonic::{
-    IntoRequest,
     transport::{Channel, ClientTlsConfig, Endpoint},
+    IntoRequest,
 };
 use tower_http::cors::CorsLayer;
 use webzjs_common::Network;
 use webzjs_wallet::Wallet;
 use zcash_client_backend::data_api::WalletRead;
 use zcash_client_backend::proto::service::{
-    ChainSpec, compact_tx_streamer_client::CompactTxStreamerClient,
+    compact_tx_streamer_client::CompactTxStreamerClient, ChainSpec,
 };
 use zcash_client_memory::MemoryWalletDb;
 
@@ -32,7 +32,11 @@ lazy_static! {
         eprintln!("Error: LIGHT_CLIENT_URL environment variable not found");
         std::process::exit(1);
     });
-    static ref NETWORK: (zcash_protocol::consensus::Network, Network) = {
+    static ref NETWORK: (
+        zcash_protocol::consensus::Network,
+        zcash_protocol::consensus::NetworkType,
+        Network
+    ) = {
         let mainnet_str = std::env::var("MAINNET").unwrap_or_else(|_| {
             eprintln!("Error: MAINNET environment variable not found");
             std::process::exit(1);
@@ -41,11 +45,13 @@ lazy_static! {
         if is_mainnet {
             (
                 zcash_protocol::consensus::Network::MainNetwork,
+                zcash_protocol::consensus::NetworkType::Main,
                 Network::MainNetwork,
             )
         } else {
             (
                 zcash_protocol::consensus::Network::TestNetwork,
+                zcash_protocol::consensus::NetworkType::Test,
                 Network::TestNetwork,
             )
         }
@@ -110,6 +116,10 @@ async fn get_address(
     State(state): State<Arc<AppState>>,
     Path(contract_address): Path<String>,
 ) -> impl IntoResponse {
+    println!(
+        "get_address called with contract_address: {}",
+        contract_address
+    );
     // find account id from contract address
     let account_id = {
         let contracts = state.contracts.read().await;
@@ -122,13 +132,16 @@ async fn get_address(
             );
         }
     };
+    println!("Found account_id: {:?}", account_id);
 
     // get the address
     let db = state.wallet.db();
     let db = db.read().await;
     match db.get_current_address(account_id) {
         Ok(Some(address)) => {
-            let address_string = address.to_address(zcash_protocol::consensus::NetworkType::Main);
+            println!("Unified address: {:?}", address);
+            let address_string = address.to_address(NETWORK.1);
+            println!("Transparent: {:?}", address_string);
             (StatusCode::OK, address_string.to_string())
         }
         Ok(None) => (StatusCode::NOT_FOUND, "Address not found".to_string()),
@@ -225,7 +238,7 @@ async fn transfer_to_holding(
         db.get_current_address(AccountId::from(1))
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
             .ok_or(StatusCode::NOT_FOUND)?
-            .to_address(zcash_protocol::consensus::NetworkType::Main)
+            .to_address(NETWORK.1)
     };
 
     let (account_id, hd_index) = {
@@ -242,6 +255,7 @@ async fn transfer_to_holding(
         .transfer(&SEED_PHRASE, hd_index, account_id, holding_address, amount)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    println!("Transferred {} zatoshis to holding address", amount);
     Ok(())
 }
 
@@ -289,7 +303,7 @@ async fn create_job(
         let db = db.read().await;
         match db.get_current_address(account_id) {
             Ok(Some(address)) => address
-                .to_address(zcash_protocol::consensus::NetworkType::Main)
+                .to_address(NETWORK.1)
                 .to_string(),
             _ => return Err(StatusCode::INTERNAL_SERVER_ERROR),
         }
@@ -422,7 +436,7 @@ async fn setup_wallet() -> Result<
     println!("latest block: {:?}", latest_block);
     // setup wallet
     let db = MemoryWalletDb::new(NETWORK.0, MAX_CHECKPOINTS);
-    let wallet = Wallet::new(db, channel, Network::MainNetwork, NonZero::from_str("1")?)?;
+    let wallet = Wallet::new(db, channel, NETWORK.2, NonZero::from_str("1")?)?;
 
     // choose birthday height
     let birthday_height: u64 = BIRTHDAY_HEIGHT.unwrap_or_else(|| {
@@ -432,6 +446,8 @@ async fn setup_wallet() -> Result<
         );
         latest_block.get_ref().height
     });
+    println!("Chose height: {}", birthday_height);
+    println!("Latest height: {}", latest_block.get_ref().height);
 
     wallet
         .create_account(
@@ -451,6 +467,13 @@ async fn setup_wallet() -> Result<
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenvy::dotenv().ok();
+
+    let mainnet_str = std::env::var("MAINNET").unwrap_or_else(|_| {
+        eprintln!("Error: MAINNET environment variable not found");
+        std::process::exit(1);
+    });
+    let is_mainnet = mainnet_str.to_lowercase() == "true" || mainnet_str == "1";
+    println!("Using {} network", if is_mainnet { "mainnet" } else { "testnet" });
 
     // setup wallet
     let wallet = setup_wallet().await?;
@@ -488,7 +511,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // serve intent api
     let app = Router::new()
-        .route("/get_address", get(get_address))
+        .route("/get_address/{contract_address}", get(get_address))
         .route("/sync", get(sync_wallet))
         .route("/orchard_balance", get(get_orchard_balance))
         .route("/create_job", post(create_job))
@@ -496,8 +519,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_state(app_state)
         .layer(CorsLayer::permissive());
 
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000").await?;
-    println!("Server listening on http://127.0.0.1:3000");
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await?;
+    println!("Server listening on http://0.0.0.0:3000");
 
     axum::serve(listener, app).await?;
 

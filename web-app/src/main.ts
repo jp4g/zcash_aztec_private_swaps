@@ -45,9 +45,9 @@ const setupTabNavigation = () => {
 
 const bootstrap = () => {
   setupTabNavigation()
-  setActiveView('zcash')
-  void initZcashView()
+  setActiveView('aztec')
   initAztecView()
+  void initZcashView()
 }
 
 bootstrap()

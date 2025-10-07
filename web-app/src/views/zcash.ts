@@ -1,3 +1,5 @@
+import { ESCROW_CONTRACT_EVENT, getEscrowContract } from '../storage.ts'
+
 const ZCASH_API_BASE_URL = 'http://localhost:3000'
 
 type ZcashElements = {
@@ -13,6 +15,7 @@ type ZcashElements = {
   successSection: HTMLElement | null
   errorSection: HTMLElement | null
   errorMessage: HTMLElement | null
+  escrowInfo: HTMLElement | null
   copyButton: HTMLButtonElement | null
 }
 
@@ -32,6 +35,7 @@ const getElements = (): ZcashElements => {
     successSection: document.getElementById('zcash-success-section'),
     errorSection: document.getElementById('zcash-error'),
     errorMessage: document.querySelector('#zcash-error .error-message') as HTMLElement | null,
+    escrowInfo: document.getElementById('zcash-escrow-info'),
     copyButton: panel?.querySelector<HTMLButtonElement>('.copy-btn') ?? null,
   }
 }
@@ -64,8 +68,32 @@ const showError = (elements: ZcashElements, message: string) => {
   if (elements.errorMessage) elements.errorMessage.textContent = `Error: ${message}`
 }
 
-const getAddress = async (): Promise<string> => {
-  const response = await fetch(`${ZCASH_API_BASE_URL}/get_address`)
+const showEscrowInfo = (elements: ZcashElements) => {
+  if (elements.escrowInfo) {
+    elements.escrowInfo.style.display = 'block'
+  }
+}
+
+const hideEscrowInfo = (elements: ZcashElements) => {
+  if (elements.escrowInfo) {
+    elements.escrowInfo.style.display = 'none'
+  }
+}
+
+const applyEscrowContract = (elements: ZcashElements, address: string | null) => {
+  if (elements.partialAddress) {
+    elements.partialAddress.value = address ?? ''
+  }
+
+  if (address) {
+    hideEscrowInfo(elements)
+  } else {
+    showEscrowInfo(elements)
+  }
+}
+
+const getAddress = async (contract: string = "default"): Promise<string> => {
+  const response = await fetch(`${ZCASH_API_BASE_URL}/get_address/${contract}`)
   if (!response.ok) {
     throw new Error('Failed to get address')
   }
@@ -181,7 +209,30 @@ export const initZcashView = async () => {
     const address = await getAddress()
     showWalletInfo(elements, address)
 
+    elements.paymentForm.setAttribute('novalidate', 'true')
     setupCopyButton(elements)
+
+    const syncEscrowContract = (address: string | null) => {
+      applyEscrowContract(elements, address)
+    }
+
+    syncEscrowContract(getEscrowContract())
+
+    const handleEscrowUpdate = (event: Event) => {
+      const { address: updatedAddress } = (event as CustomEvent<{ address: string }>).detail
+      syncEscrowContract(updatedAddress)
+    }
+
+    window.addEventListener(ESCROW_CONTRACT_EVENT, handleEscrowUpdate)
+
+    elements.partialAddress.addEventListener('input', () => {
+      const inputValue = elements.partialAddress?.value.trim() ?? ''
+      if (inputValue) {
+        hideEscrowInfo(elements)
+      } else if (!getEscrowContract()) {
+        showEscrowInfo(elements)
+      }
+    })
 
     elements.paymentForm.addEventListener('submit', async (event) => {
       event.preventDefault()
@@ -189,10 +240,16 @@ export const initZcashView = async () => {
       const contractAddress = elements.partialAddress?.value.trim()
       const amountValue = parseInt(elements.amount?.value ?? '0', 10)
 
-      if (contractAddress && amountValue > 0) {
+      if (!contractAddress) {
+        showEscrowInfo(elements)
+        return
+      }
+
+      if (amountValue > 0) {
+        hideEscrowInfo(elements)
         await handleEscrowSubmission(elements, contractAddress, amountValue)
       } else {
-        showError(elements, 'Please enter a valid contract address and amount')
+        showError(elements, 'Please enter a valid amount')
       }
     })
   } catch (error) {
